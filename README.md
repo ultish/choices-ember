@@ -402,6 +402,19 @@ pnpm test:ember
 
 The test-app includes single/multi/text, groups, async reload, nested tracked Person form, classNames override, dependent fieldsets, and a daisyUI theme switcher.
 
+### Demo (GitHub Pages)
+
+On push to `main`, [`.github/workflows/pages.yml`](./.github/workflows/pages.yml) builds the test-app and deploys it to GitHub Pages.
+
+1. Repo **Settings → Pages → Source: GitHub Actions**
+2. After the first successful run: `https://ultish.github.io/choices-ember/`
+
+Local production build with the same base path:
+
+```bash
+ROOT_URL=/choices-ember/ pnpm --filter test-app build
+```
+
 ---
 
 ## Changelog
