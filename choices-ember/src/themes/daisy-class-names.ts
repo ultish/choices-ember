@@ -1,0 +1,87 @@
+import type { ClassNames } from 'choices.js';
+
+/**
+ * daisyUI 5 + Tailwind utility preset for Choices classNames.
+ *
+ * Keep BEM hooks Choices JS relies on; append utilities for look/layout.
+ * This file must stay as **literal class strings** so Tailwind content
+ * scanning (when pointed at this package) can see them.
+ */
+export const DAISY_CLASS_NAMES: ClassNames = {
+  containerOuter: ['choices', 'w-full', 'relative', 'choices-ember--daisy'],
+  containerInner: [
+    'choices__inner',
+    'input',
+    'input-bordered',
+    'w-full',
+    'min-h-12',
+    'h-auto',
+    'flex',
+    'flex-wrap',
+    'items-center',
+    'gap-1',
+    'py-2',
+  ],
+  input: ['choices__input'],
+  inputCloned: [
+    'choices__input--cloned',
+    'input',
+    'input-ghost',
+    'input-sm',
+    'grow',
+    'min-w-[6rem]',
+    'border-0',
+    'bg-transparent',
+    'focus:outline-none',
+  ],
+  list: ['choices__list'],
+  listItems: ['choices__list--multiple', 'flex', 'flex-wrap', 'gap-1'],
+  listSingle: ['choices__list--single'],
+  listDropdown: [
+    'choices__list--dropdown',
+    'menu',
+    'bg-base-100',
+    'rounded-box',
+    'shadow-lg',
+    'border',
+    'border-base-300',
+    'z-[100]',
+    'p-1',
+    'mt-1',
+  ],
+  item: ['choices__item'],
+  itemSelectable: ['choices__item--selectable', 'rounded-lg'],
+  itemDisabled: ['choices__item--disabled', 'opacity-50'],
+  itemChoice: ['choices__item--choice', 'rounded-lg'],
+  description: ['choices__description', 'text-xs', 'opacity-70'],
+  placeholder: ['choices__placeholder', 'opacity-50'],
+  group: ['choices__group'],
+  groupHeading: ['choices__heading', 'menu-title', 'text-xs', 'font-semibold'],
+  button: [
+    'choices__button',
+    'btn',
+    'btn-ghost',
+    'btn-xs',
+    'min-h-0',
+    'h-5',
+    'w-5',
+    'p-0',
+  ],
+  activeState: ['is-active'],
+  focusState: ['is-focused'],
+  openState: ['is-open'],
+  disabledState: ['is-disabled', 'opacity-60'],
+  highlightedState: [
+    'is-highlighted',
+    'bg-primary',
+    'text-primary-content',
+  ],
+  selectedState: ['is-selected'],
+  flippedState: ['is-flipped'],
+  loadingState: ['is-loading'],
+  invalidState: ['is-invalid'],
+  notice: ['choices__notice', 'text-sm', 'opacity-70', 'p-2'],
+  addChoice: ['choices__item--selectable', 'add-choice', 'rounded-lg'],
+  noResults: ['has-no-results'],
+  noChoices: ['has-no-choices'],
+};

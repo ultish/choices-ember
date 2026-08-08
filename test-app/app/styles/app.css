@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+
+/* Enable multiple themes so the demo theme selector can switch data-theme */
+@plugin 'daisyui' {
+  themes:
+    light --default,
+    dark --prefersdark,
+    cupcake,
+    bumblebee,
+    emerald,
+    corporate,
+    synthwave,
+    retro,
+    cyberpunk,
+    valentine,
+    halloween,
+    garden,
+    forest,
+    aqua,
+    lofi,
+    pastel,
+    fantasy,
+    wireframe,
+    black,
+    luxury,
+    dracula,
+    cmyk,
+    autumn,
+    business,
+    acid,
+    lemonade,
+    night,
+    coffee,
+    winter,
+    dim,
+    nord,
+    sunset;
+}
+
+/* Choices stock skin */
+@import 'choices.js/public/assets/styles/choices.css';
+
+/* Optional daisyUI variable bridge (addon) */
+@import 'choices-ember/styles/daisyui-theme.css';
+
+/*
+ * Tailwind content: classic Ember + workspace addon source so daisy
+ * class strings in choices-ember themes are not purged.
+ * Tailwind v4 auto-detects; ensure addon paths are reachable:
+ */
+@source "../../../choices-ember/src/**/*.{gts,ts,js}";
+@source "../**/*.{gjs,gts,hbs,js,ts}";
