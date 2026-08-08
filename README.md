@@ -425,37 +425,41 @@ ROOT_URL=/choices-ember/ pnpm --filter test-app build
 
 Releases run on **version tags** via [`.github/workflows/release.yml`](./.github/workflows/release.yml) (not on every `main` push).
 
-**Important:** CI cannot enter an authenticator OTP. A normal “2FA publish” token will fail with `EOTP`.
+Auth is **npm Trusted Publishing (OIDC)** — npm’s recommended path. No long-lived token, no OTP in CI, no “Bypass 2FA” token.
 
-#### Auth option A — Granular token with Bypass 2FA (simplest first publish)
+#### One-time: first publish (package must exist on npm)
 
-1. [npmjs.com → Access Tokens](https://www.npmjs.com/settings/~/tokens) → **Generate New Token** → **Granular Access Token**
-2. Permissions: **Read and write** for package `choices-ember` (or permission to **create** packages if it does not exist yet)
-3. Check **Bypass two-factor authentication** (required for GitHub Actions)
-4. GitHub → **Settings → Secrets and variables → Actions** → `NPM_TOKEN` = that token
-5. Re-run **Actions → Release → v0.1.0 → Re-run failed jobs**
-
-#### Auth option B — Trusted Publishing / OIDC (no long-lived token)
-
-After the package exists on npm once:
-
-1. npmjs.com → **choices-ember** → **Settings → Trusted Publisher** → GitHub Actions  
-   - User/org: `ultish`  
-   - Repo: `choices-ember`  
-   - Workflow filename: `release.yml` (filename only)  
-   - Allow: `npm publish`
-2. You can remove `NPM_TOKEN` — the workflow uses OIDC (`id-token: write`)
-
-#### Cut a release
+Trusted Publisher is configured **on the package**, so the package has to exist once. Do that **locally** (you can enter OTP here; CI cannot):
 
 ```bash
-# 1. Bump version in choices-ember/package.json (e.g. 0.1.0)
-# 2. Commit on main
-git tag v0.1.0          # must match package.json without the "v"
-git push origin v0.1.0  # triggers Release workflow → npm publish
+cd choices-ember
+# ensure you're logged in: npm login
+npm publish --access public
+# enter OTP when prompted
 ```
 
-The workflow: install → tag ≡ version check → lint → test → pack → `npm publish` from `choices-ember/`.
+If `0.1.0` is already taken by a failed attempt or you already published it, bump the version first (e.g. `0.1.1`) in `choices-ember/package.json`, commit, then publish that version.
+
+#### One-time: Trusted Publisher on npmjs.com
+
+1. Open https://www.npmjs.com/package/choices-ember → **Settings** → **Trusted Publisher**
+2. Choose **GitHub Actions** and set:
+   - **Organization or user:** `ultish`
+   - **Repository:** `choices-ember`
+   - **Workflow filename:** `release.yml` (filename only, not a path)
+   - **Allowed actions:** `npm publish`
+3. Save. You do **not** need `NPM_TOKEN` in GitHub for publish.
+
+#### Later releases (CI)
+
+```bash
+# 1. Bump version in choices-ember/package.json
+# 2. Commit on main
+git tag v0.1.1          # must match package.json without the "v"
+git push origin v0.1.1  # Actions → Release publishes via OIDC
+```
+
+The workflow: install → tag ≡ version check → lint → test → pack → `npm publish` (OIDC).
 
 Dry-run without publishing: **Actions → Release → Run workflow** (dry_run checked).
 

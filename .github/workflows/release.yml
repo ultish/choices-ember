@@ -1,26 +1,19 @@
 # Publish choices-ember to npm when a version tag is pushed.
 #
-# Auth (pick one — OTP tokens will NOT work in CI):
+# Auth: npm Trusted Publishing (OIDC) — no NPM_TOKEN, no OTP in CI.
+# npm recommends this over “Bypass 2FA” granular tokens.
 #
-#   A) Recommended: npm Trusted Publishing (OIDC, no long-lived token)
-#      1. First publish once (see README) so the package exists on npm
-#      2. npmjs.com → package → Settings → Trusted Publisher → GitHub Actions:
-#           Organization/user: ultish
-#           Repository:        choices-ember
-#           Workflow filename: release.yml
-#           Allowed:           npm publish
-#      3. Re-run this workflow (no NPM_TOKEN needed)
-#
-#   B) Granular access token WITH "Bypass two-factor authentication" checked
-#      1. npmjs.com → Access Tokens → Granular Access Token
-#      2. Packages: publish/create for choices-ember
-#      3. ☑ Bypass two-factor authentication  ← required for CI
-#      4. GitHub → Secrets → NPM_TOKEN = that token
+# One-time setup (package must exist on npm first — see README if not):
+#   npmjs.com → choices-ember → Settings → Trusted Publisher → GitHub Actions
+#     Organization or user:  ultish
+#     Repository:            choices-ember
+#     Workflow filename:     release.yml
+#     Allowed actions:       npm publish
 #
 # Release:
 #   Bump choices-ember/package.json version, commit, then:
-#     git tag v0.1.0 && git push origin v0.1.0
-#   Tag must match package.json (v0.1.0 ↔ 0.1.0).
+#     git tag v0.1.1 && git push origin v0.1.1
+#   Tag must match package.json (v0.1.1 ↔ 0.1.1).
 name: Release
 
 on:
@@ -36,7 +29,7 @@ on:
 
 permissions:
   contents: read
-  # Required for OIDC trusted publishing + provenance
+  # Required for OIDC trusted publishing (+ automatic provenance)
   id-token: write
 
 concurrency:
@@ -56,10 +49,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          # Trusted publishing needs Node >= 22.14 and recent npm
+          # Trusted publishing: Node >= 22.14 and npm >= 11.5.1
           node-version: 22
           cache: pnpm
           registry-url: 'https://registry.npmjs.org'
+          # Avoid stale caches in release builds
+          package-manager-cache: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -94,22 +89,18 @@ jobs:
           echo "--- tarball contents (first 80 entries) ---"
           tar -tzf choices-ember-*.tgz | head -80
 
-      - name: Publish to npm
+      - name: Publish to npm (OIDC trusted publishing)
         if: >-
           github.event_name == 'push' ||
           (github.event_name == 'workflow_dispatch' && inputs.dry_run == false)
         working-directory: choices-ember
-        env:
-          # Optional fallback. Prefer OIDC trusted publishing (no token).
-          # Do NOT use a 2FA-bound token — it will fail with EOTP in CI.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
           echo "npm $(npm --version) node $(node --version)"
-          # npm CLI uses OIDC in GHA when id-token: write is set; then falls back to NODE_AUTH_TOKEN.
+          # No NODE_AUTH_TOKEN — npm CLI uses GitHub OIDC when id-token: write is set.
+          # Provenance is generated automatically with trusted publishing.
           # --access public: unscoped package on free accounts
-          # provenance is automatic with trusted publishing; fine with tokens too
-          npm publish --access public --provenance
+          npm publish --access public
 
       - name: Dry-run notice
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run != false
