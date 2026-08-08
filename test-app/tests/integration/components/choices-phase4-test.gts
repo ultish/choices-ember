@@ -9,6 +9,7 @@ import {
 import { tracked } from '@glimmer/tracking';
 import Choices from 'choices-ember/components/choices';
 import type { ChoicesOption, ChoicesPublicAPI } from 'choices-ember';
+import type { Options as ChoicesConfig } from 'choices.js';
 
 class Context {
   @tracked options: ChoicesOption[] = [
@@ -198,6 +199,77 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     assert.strictEqual(selectedLabel(), 'Remote One');
   });
 
+  test('entity-first preselect: @value set while options empty, then options land', async function (assert) {
+    const ctx = new Context();
+    ctx.options = [];
+    ctx.selected = null;
+    const changesBefore = ctx.onChangeCount;
+
+    await render(
+      <template>
+        <Choices
+          @type='single'
+          @options={{ctx.options}}
+          @value={{ctx.selected}}
+          @onChange={{ctx.onChange}}
+          @placeholder='Waiting…'
+        />
+      </template>,
+    );
+
+    // Entity query resolved first — foreign key known, list still loading
+    ctx.selected = 'sf';
+    await settled();
+    assert.strictEqual(
+      ctx.onChangeCount,
+      changesBefore,
+      'programmatic @value does not fire onChange',
+    );
+
+    // Cities query resolves later
+    ctx.options = [
+      { value: 'nyc', label: 'New York' },
+      { value: 'sf', label: 'San Francisco' },
+    ];
+    await settled();
+
+    assert.strictEqual(
+      selectedLabel(),
+      'San Francisco',
+      'selection painted after options arrive',
+    );
+    assert.strictEqual(
+      ctx.onChangeCount,
+      changesBefore,
+      'still no user onChange from bridge sync',
+    );
+  });
+
+  test('options-first preselect: options ready, then entity sets @value', async function (assert) {
+    const ctx = new Context();
+    ctx.options = [
+      { value: 'nyc', label: 'New York' },
+      { value: 'sf', label: 'San Francisco' },
+    ];
+    ctx.selected = null;
+
+    await render(
+      <template>
+        <Choices
+          @type='single'
+          @options={{ctx.options}}
+          @value={{ctx.selected}}
+          @onChange={{ctx.onChange}}
+        />
+      </template>,
+    );
+
+    ctx.selected = 'nyc';
+    await settled();
+
+    assert.strictEqual(selectedLabel(), 'New York');
+  });
+
   test('destroy mid-flight async does not throw', async function (assert) {
     const ctx = new Context();
     ctx.options = [];
@@ -248,6 +320,65 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
 
     await clearRender();
     assert.strictEqual(ctx.api, null, 'API cleared on destroy');
+  });
+
+  test('@theme daisy + @config.classNames merges and applies slots on DOM', async function (assert) {
+    const ctx = new Context();
+    ctx.selected = '1';
+
+    // Distinct token so we prove app overrides land on Choices-owned nodes.
+    // Partial classNames is fine at runtime (Choices shallow-merges defaults).
+    const config = {
+      searchEnabled: true,
+      classNames: {
+        containerOuter: [
+          'choices',
+          'w-full',
+          'relative',
+          'choices-ember--daisy',
+          'test-override-outer',
+        ],
+        containerInner: [
+          'choices__inner',
+          'input',
+          'input-bordered',
+          'test-override-inner',
+        ],
+        listDropdown: [
+          'choices__list--dropdown',
+          'test-override-dropdown',
+        ],
+      },
+    } as Partial<ChoicesConfig>;
+
+    await render(
+      <template>
+        <Choices
+          @type='single'
+          @theme='daisy'
+          @options={{ctx.options}}
+          @value={{ctx.selected}}
+          @onChange={{ctx.onChange}}
+          @config={{config}}
+        />
+      </template>,
+    );
+
+    assert
+      .dom('.choices')
+      .hasClass('choices-ember--daisy', 'daisy theme hook present')
+      .hasClass('test-override-outer', 'containerOuter override applied');
+    assert
+      .dom('.choices__inner')
+      .hasClass('test-override-inner', 'containerInner override applied');
+
+    await click('.choices');
+    assert
+      .dom('.choices__list--dropdown')
+      .hasClass(
+        'test-override-dropdown',
+        'listDropdown override applied on open',
+      );
   });
 
   test('changing searchEnabled recreates instance (RECREATE_KEYS)', async function (assert) {

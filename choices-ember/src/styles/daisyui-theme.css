@@ -4,10 +4,13 @@
  * Maps daisyUI / Tailwind semantic tokens onto Choices CSS variables.
  * Does NOT include daisyUI or Tailwind source — the app must provide those.
  *
- * Import after Choices structure/skin CSS:
- *   import 'choices.js/public/assets/styles/choices.css';
- *   // or 'choices-ember/styles/choices-default.css'
- *   import 'choices-ember/styles/daisyui-theme.css';
+ * Import Choices skin + this bridge in a **lower cascade layer** than Tailwind
+ * utilities, or classNames utilities lose to stock Choices paint rules:
+ *
+ *   @import 'tailwindcss';
+ *   @plugin 'daisyui';
+ *   @import 'choices.js/public/assets/styles/choices.css' layer(components);
+ *   @import 'choices-ember/styles/daisyui-theme.css' layer(components);
  */
 
 .choices,
@@ -42,10 +45,21 @@
   outline-offset: 2px;
 }
 
-/* Dropdown above daisy modals/drawers (classNames also set z-[100]) */
+/*
+ * Dropdown: stick to the control width.
+ * daisyUI `menu` utilities often set content width (e.g. max-content), which
+ * shrinks the list when Choices skin is in a lower cascade layer. Force full
+ * width of `.choices` (positioned ancestor) so the panel matches the input.
+ */
 .choices.choices-ember--daisy .choices__list--dropdown,
 .choices.choices-ember--daisy .choices__list[aria-expanded] {
   z-index: 100;
+  left: 0;
+  right: 0;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /*

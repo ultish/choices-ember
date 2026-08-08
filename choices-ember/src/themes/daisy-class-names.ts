@@ -40,6 +40,9 @@ export const DAISY_CLASS_NAMES: ClassNames = {
   listDropdown: [
     'choices__list--dropdown',
     'menu',
+    // menu can shrink to content; keep panel as wide as the control
+    'w-full',
+    'min-w-full',
     'bg-base-100',
     'rounded-box',
     'shadow-lg',

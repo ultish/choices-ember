@@ -1,5 +1,26 @@
 @import 'tailwindcss';
 
+/*
+ * Sticky cookbook header covers in-page #anchors unless we reserve space.
+ * scroll-padding-top applies to fragment navigation; scroll-margin on
+ * sections is a belt-and-suspenders for the same offset.
+ */
+:root {
+  --cookbook-sticky-offset: 5.5rem;
+}
+
+@media (max-width: 40rem) {
+  /* header wraps (title + theme select) on narrow viewports */
+  :root {
+    --cookbook-sticky-offset: 7.5rem;
+  }
+}
+
+html {
+  scroll-padding-top: var(--cookbook-sticky-offset);
+  scroll-behavior: smooth;
+}
+
 /* Enable multiple themes so the demo theme selector can switch data-theme */
 @plugin 'daisyui' {
   themes:
@@ -37,16 +58,17 @@
     sunset;
 }
 
-/* Choices stock skin */
-@import 'choices.js/public/assets/styles/choices.css';
-
-/* Optional daisyUI variable bridge (addon) */
-@import 'choices-ember/styles/daisyui-theme.css';
+/*
+ * Put Choices skin in a lower cascade layer than Tailwind utilities.
+ * Unlayered Choices CSS always beats `@layer utilities`, so classNames
+ * overrides (input-primary, rounded-2xl, bg-primary, …) appear to "do nothing".
+ */
+@import 'choices.js/public/assets/styles/choices.css' layer(components);
+@import 'choices-ember/styles/daisyui-theme.css' layer(components);
 
 /*
  * Tailwind content: classic Ember + workspace addon source so daisy
  * class strings in choices-ember themes are not purged.
- * Tailwind v4 auto-detects; ensure addon paths are reachable:
  */
 @source "../../../choices-ember/src/**/*.{gts,ts,js}";
 @source "../**/*.{gjs,gts,hbs,js,ts}";

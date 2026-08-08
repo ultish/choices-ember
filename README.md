@@ -45,12 +45,15 @@ Core `<Choices @theme="default">` works with **no** Tailwind or daisyUI.
 
 The app owns the Tailwind + daisyUI pipeline. The addon only ships a **CSS variable bridge** and a `classNames` preset.
 
+**Cascade layering (required):** import Choices skin (and optional `daisyui-theme.css`) with `layer(components)` so they sit **below** Tailwind’s `@layer utilities`. Unlayered Choices CSS always wins over utilities, so daisy `classNames` (`input-bordered`, `rounded-2xl`, `bg-primary`, …) look like they do nothing even when the classes are on the DOM.
+
 ```css
 @import 'tailwindcss';
 @plugin 'daisyui';
 
-@import 'choices.js/public/assets/styles/choices.css';
-@import 'choices-ember/styles/daisyui-theme.css';
+/* layer(components) — below utilities; do not drop this */
+@import 'choices.js/public/assets/styles/choices.css' layer(components);
+@import 'choices-ember/styles/daisyui-theme.css' layer(components);
 
 /* so daisy/Tailwind classes in the addon preset are not purged */
 @source "../node_modules/choices-ember/dist/**/*.js";
@@ -58,7 +61,10 @@ The app owns the Tailwind + daisyUI pipeline. The addon only ships a **CSS varia
 /* @source "../../choices-ember/src/**/*.{gts,ts}"; */
 ```
 
-Import order: Tailwind/daisy → Choices skin → optional `daisyui-theme.css`.
+| Import | Layer |
+|--------|--------|
+| `tailwindcss` / daisyUI | theme / base / utilities (as Tailwind defines) |
+| Choices skin + `daisyui-theme.css` | **`layer(components)`** (must be lower than utilities) |
 
 ---
 
@@ -400,7 +406,7 @@ pnpm start          # addon watch + test-app
 pnpm test:ember
 ```
 
-The test-app includes single/multi/text, groups, async reload, nested tracked Person form, classNames override, dependent fieldsets, and a daisyUI theme switcher.
+The **test-app is the cookbook**: each demo is a live control plus a **How to build this** recipe (not a Choices.js-style mystery gallery). See [docs/COOKBOOK.md](./docs/COOKBOOK.md) for the section index.
 
 ### Demo (GitHub Pages)
 

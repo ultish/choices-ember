@@ -1,167 +1,48 @@
 # Demo cookbook
 
-Map major [Choices demo](https://choices-js.github.io/Choices/) scenarios to `choices-ember`.
+**Canonical cookbook is the live test-app**, not a separate gallery of black-box widgets.
 
-## Single select
-
-```hbs
-<Choices
-  @type="single"
-  @options={{this.opts}}
-  @value={{this.selected}}
-  @onChange={{this.onChange}}
-  @placeholder="Pick one"
-/>
+```bash
+pnpm start   # open the test-app
+# or GitHub Pages: https://ultish.github.io/choices-ember/
 ```
 
-## Multiple + remove
+Every section on that page has:
 
-```hbs
-<Choices
-  @type="multiple"
-  @options={{this.opts}}
-  @value={{this.ids}}
-  @onChange={{this.onMulti}}
-/>
+1. **Live** control (working Ember state)
+2. **How to build this** — the recipe to copy (`test-app/app/templates/application.gts`)
+
+## Sections
+
+| Id | Recipe |
+|----|--------|
+| `#single` | Controlled single select |
+| `#multiple` | Multiple + `@onAdd` / `@onRemove` / `@onChange` (live event log) |
+| `#text` | Text / tags + same event wiring |
+| `#events` | Event model + **live multi** log (`onChange` vs add/remove) |
+| `#domain` | Domain / GQL models implementing `InputChoice` |
+| `#groups` | Option groups (`InputGroup`) |
+| `#no-search` | `searchEnabled: false` |
+| `#async` | Entity-page async preselect (value-first or options-first; keep `@value` on refresh) |
+| `#tracked` | Nested `@tracked` labels + edit form |
+| `#dependent` | Dependent selects (clear child on parent change) |
+| `#fieldset` | `<ChoicesFieldset>` daisy chrome |
+| `#classnames` | Override `DAISY_CLASS_NAMES` via `@config.classNames` |
+| `#escape` | `registerAPI` / `onReady` / recreate keys |
+
+## Mental model (all recipes)
+
+```
+App tracked data  ──snapshot──►  setChoices / setChoiceByValue / setValue
+App callbacks     ◄──events──  change / addItem / removeItem / …
 ```
 
-`removeItemButton` defaults **true** for multiple. Disable with `@config={{hash removeItemButton=false}}`.
-
-## Text / tags
-
-```hbs
-<Choices
-  @type="text"
-  @value={{this.tags}}
-  @onChange={{this.onTags}}
-  @config={{hash maxItemCount=5}}
-/>
-```
-
-## Option groups
-
-```ts
-opts = [
-  {
-    label: 'Group A',
-    value: 'a',
-    choices: [
-      { value: '1', label: 'One' },
-      { value: '2', label: 'Two' },
-    ],
-  },
-];
-```
-
-## No search
-
-```hbs
-<Choices @config={{hash searchEnabled=false}} … />
-```
-
-## Custom property search / no sort
-
-```hbs
-<Choices
-  @config={{hash
-    shouldSort=false
-    searchFields=(array "label" "value" "customProperties.description")
-  }}
-  …
-/>
-```
-
-## Remote / async (parent load)
-
-```ts
-@tracked options = [];
-@tracked value: string | null = null;
-
-async load() {
-  const previous = this.value;
-  // Do not clear `value` while loading — selection stays put.
-  this.options = await fetch('/api').then((r) => r.json());
-  // Only drop selection if the id vanished from the new list.
-  if (previous != null && !this.options.some((o) => o.value === previous)) {
-    this.value = null;
-  }
-}
-```
-
-```hbs
-<Choices @options={{this.options}} @value={{this.v}} @onChange={{this.onChange}} />
-```
-
-The bridge re-applies controlled `@value` after every `setChoices` replace, so a surviving id keeps its selection (label may update if the server renamed it).
-
-## Nested tracked domain labels + edit form
-
-```ts
-class Person {
-  id: string;
-  @tracked name: string;
-  constructor(id: string, name: string) {
-    this.id = id;
-    this.name = name;
-  }
-}
-
-@tracked people = [new Person('1', 'Ada'), new Person('2', 'Grace')];
-@tracked selectedId: string | null = null;
-
-get choiceOptions() {
-  return this.people.map((p) => ({
-    value: p.id,
-    label: p.name, // tracked read — invalidates when name changes
-  }));
-}
-
-save() {
-  const person = this.people.find((p) => p.id === this.selectedId);
-  if (person) person.name = this.draftName; // dropdown label updates; id stays
-}
-```
-
-See test-app application demo for the full form flow.
-
-## Dependent selects
-
-Two components; parent clears child `@value` and swaps `@options` when parent changes. See test-app application demo.
-
-## daisyUI fieldset row
-
-```hbs
-<ChoicesFieldset
-  @legend="Charge code"
-  @description="Search by name or id"
-  @type="single"
-  @options={{this.choiceOptions}}
-  @value={{this.selected}}
-  @onChange={{this.onChange}}
-  @fieldsetClass="bg-base-200 border-base-300 rounded-box border p-4 w-full"
-/>
-```
-
-## Escape hatches
-
-```hbs
-<Choices
-  @onReady={{this.onReady}}
-  @registerAPI={{this.registerAPI}}
-  @onSearch={{this.onSearch}}
-  @onShowDropdown={{this.onShow}}
-  @onHideDropdown={{this.onHide}}
-  @syncKey={{this.version}}
-  …
-/>
-```
-
-`registerAPI` receives `{ focus, clearStore, getValue, instance }` and `null` on destroy.
-
-## Recreate keys
-
-Changing these rebuilds the Choices instance: `searchEnabled`, `classNames`, `allowHTML`, `callbackOnCreateTemplates`, plus `@theme` and `@type`. See `RECREATE_KEYS` export.
+- Empty host element — **no** `{{#each}}` options + `refresh()`
+- Values coerced to **string** at the boundary
+- Daisy CSS: import Choices + `daisyui-theme.css` in **`layer(components)`** (see README)
+- Domain classes may `implements InputChoice` (`value` + `label`); or map GQL → plain choices in a getter
 
 ## Full Choices options
 
-Pass any Choices 11 constructor option via `@config`. See [Choices docs](https://github.com/Choices-js/Choices#setup).
+Pass any Choices 11 constructor option via `@config`.  
+See [Choices setup](https://github.com/Choices-js/Choices#setup). Changing recreate keys rebuilds the instance: `searchEnabled`, `classNames`, `allowHTML`, `callbackOnCreateTemplates`, plus `@theme` / `@type`.
