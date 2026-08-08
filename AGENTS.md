@@ -7,7 +7,7 @@ Instructions for coding agents (and humans) working in this repository.
 **`choices-ember`** is an Embroider **v2** Ember addon that wraps [Choices.js](https://github.com/Choices-js/Choices) with Ember autotracking, plus an optional daisyUI 5 fieldset wrapper.
 
 - **npm package name:** `choices-ember`
-- **Status:** design-first; implement against the docs below. Do not invent a different architecture.
+- **Status:** implement and maintain against the docs below. Do not invent a different architecture.
 
 ## Read before you write code
 
@@ -15,32 +15,11 @@ In this order:
 
 | Order | File | Purpose |
 |------:|------|---------|
-| 1 | [docs/DECISIONS.md](./docs/DECISIONS.md) | **Frozen** product/tech choices. Do not re-litigate. |
-| 2 | [docs/ember-v2-addon-spec.md](./docs/ember-v2-addon-spec.md) | Full design: reactivity, API, bridge, theming, tests. |
-| 3 | Phase checklist for the **active** phase (see below) | Concrete acceptance criteria |
-| 4 | [README.md](./README.md) | Human-facing overview and local path references. |
+| 1 | [docs/design/DECISIONS.md](./docs/design/DECISIONS.md) | **Frozen** product/tech choices. Do not re-litigate. (local; gitignored) |
+| 2 | [docs/design/ember-v2-addon-spec.md](./docs/design/ember-v2-addon-spec.md) | Full design: reactivity, API, bridge, theming, tests. (local; gitignored) |
+| 3 | [README.md](./README.md) | Human-facing overview and local path references. |
 
-### Phase checklists (all written)
-
-| Phase | File | Scope |
-|------:|------|--------|
-| 1 | [docs/PHASE-1.md](./docs/PHASE-1.md) | Scaffold + controlled **single** select bridge + core reactivity tests |
-| 2 | [docs/PHASE-2.md](./docs/PHASE-2.md) | **Multiple** + **text** modes, remove button / maxItemCount |
-| 3 | [docs/PHASE-3.md](./docs/PHASE-3.md) | daisyUI 5 `@theme` + **`<ChoicesFieldset>`** (app owns Tailwind/daisy) |
-| 4 | [docs/PHASE-4.md](./docs/PHASE-4.md) | Groups, disabled, remote pattern, forms, registerAPI, docs, release readiness |
-
-If a task conflicts with `DECISIONS.md` or the **active** phase checklist, **stop and ask the human** — do not skip ahead or expand scope.
-
-## Default task (unless told otherwise)
-
-Implement **Phase 1 only** ([docs/PHASE-1.md](./docs/PHASE-1.md)):
-
-- Controlled **single** select
-- Empty host `<select>` + Choices owns option DOM
-- `setChoices` / `setChoiceByValue` + events + `destroy()`
-- ember-qunit integration tests listed in PHASE-1
-
-Do **not** start Phase 2–4 until Phase 1 acceptance is green (or the human explicitly assigns a later phase).
+If a task conflicts with `DECISIONS.md`, **stop and ask the human** — do not expand scope or change frozen decisions.
 
 ## Hard rules (non-negotiable)
 
@@ -65,7 +44,6 @@ App tracked data
     └──── onChange / events ──┘
 
 <ChoicesFieldset>  = daisyUI fieldset chrome + <Choices @theme="daisy">
-                   (Phase 3+; not Phase 1)
 ```
 
 ## Local references (this machine)
@@ -77,29 +55,9 @@ App tracked data
 
 ## How to work
 
-### Scaffolding
-
-If the monorepo is not scaffolded yet:
-
-```bash
-npx ember-cli@latest addon choices-ember \
-  -b @embroider/addon-blueprint --pnpm --typescript
-```
-
-Then align package name, peers, and layout with the spec §5.1 and `DECISIONS.md`. Prefer implementing **inside this repo** rather than creating a sibling folder with a different name.
-
-### Implementation order (Phase 1)
-
-1. Scaffold / wire package exports.
-2. `utils/map-options.ts` + `utils/normalize-value.ts` (pure; easy to unit-test).
-3. `utils/bridge.ts` (init, sync options/value, events, destroy).
-4. `components/choices.gts` (empty select + modifier/lifecycle attaching the bridge).
-5. Integration tests in test-app per PHASE-1 checklist.
-6. Stop. Summarize what passed / what’s left.
-
 ### Verification
 
-- Run the test-app / addon test script after changes (`pnpm test` or workspace equivalent once scaffolded).
+- Run the test-app / addon test script after changes (`pnpm test` or workspace equivalent).
 - Manually confirm: no `refresh(` for option updates; destroy path clean; controlled value does not loop.
 
 ### Commits
@@ -131,7 +89,7 @@ Then align package name, peers, and layout with the spec §5.1 and `DECISIONS.md
 ## When unsure
 
 1. Prefer **DECISIONS.md** over improvisation.
-2. Prefer **smaller Phase 1** over building multi/fieldset “while you’re here.”
+2. Prefer the smallest change that matches existing API and architecture.
 3. If the Choices API is ambiguous, inspect `/Users/jxhui/Developer/Choices` (types under `public/types`, implementation under `src/scripts/choices.ts`).
 4. Ask the human before changing frozen decisions, public API shape, or peer ranges.
 
@@ -139,7 +97,6 @@ Then align package name, peers, and layout with the spec §5.1 and `DECISIONS.md
 
 If you change behavior that the docs describe, update the matching doc in the same change:
 
-- New freeze → `docs/DECISIONS.md`
-- API / bridge / theming → `docs/ember-v2-addon-spec.md`
-- Phase scope / checklist → `docs/PHASE-1.md` (or a later `PHASE-N.md`)
+- New freeze → `docs/design/DECISIONS.md`
+- API / bridge / theming → `docs/design/ember-v2-addon-spec.md`
 - Agent workflow → this file

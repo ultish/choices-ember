@@ -133,7 +133,8 @@ class AttachChoicesModifier extends Modifier<AttachSignature> {
 
 /**
  * Reactive Choices.js bridge. Empty host element — Choices owns option DOM.
- * Supports `@type` single | multiple | text (controlled values).
+ * Phase 1: controlled single select is fully supported; multi/text are wired
+ * for later phases but not acceptance-tested yet.
  */
 export default class ChoicesComponent extends Component<ChoicesSignature> {
   attach = AttachChoicesModifier;
@@ -185,7 +186,7 @@ export default class ChoicesComponent extends Component<ChoicesSignature> {
   <template>
     {{#if this.isText}}
       <input
-        type='text'
+        type="text"
         name={{@name}}
         disabled={{@disabled}}
         placeholder={{@placeholder}}

@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`<ChoicesFieldset>`** daisyUI 5 fieldset chrome (composition only; optional Tailwind + daisyUI peers)
 - Option **groups** (`InputChoice | InputGroup`), parent-owned **async** options pattern
 - Design docs and phase checklists (`docs/`), agent guide (`AGENTS.md`)
-- Guides: [REACTIVITY](./docs/REACTIVITY.md), [THEMING](./docs/THEMING.md), [COOKBOOK](./docs/COOKBOOK.md)
+- Guides: [REACTIVITY](./docs/design/REACTIVITY.md), [THEMING](./docs/design/THEMING.md), [COOKBOOK](./docs/COOKBOOK.md)
 - Integration tests (single, multi, text, fieldset, groups, disabled, search, async, API, recreate)
 - **test-app** demos: single/multi/text, groups, async refresh (keeps selection), nested tracked Person form, dependent selects + fieldset, daisyUI **theme selector**
 - Glint **v2** (`@glint/ember-tsc`, `@glint/tsserver-plugin`); typecheck via `ember-tsc`

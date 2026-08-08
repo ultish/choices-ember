@@ -13,6 +13,9 @@ coverage/
 npm-debug.log*
 yarn-error.log
 
+# local design docs (not published)
+/docs/design/
+
 # ember-try
 /.node_modules.ember-try/
 /package.json.ember-try

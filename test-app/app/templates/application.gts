@@ -5,6 +5,7 @@ import { on } from '@ember/modifier';
 import type Owner from '@ember/owner';
 import Choices from 'choices-ember/components/choices';
 import ChoicesFieldset from 'choices-ember/components/choices-fieldset';
+import { DAISY_CLASS_NAMES } from 'choices-ember';
 
 const CITIES = [
   { value: 'nyc', label: 'New York' },
@@ -129,6 +130,87 @@ export default class ApplicationTemplate extends Component {
 
   /** Stable config object so Choices does not recreate on every re-render. */
   themeSelectConfig = { searchEnabled: true, shouldSort: false };
+
+  /**
+   * Client override of the daisy classNames preset.
+   * Merge order: DAISY_CLASS_NAMES ← @config.classNames (per-key replace).
+   * Keep BEM hooks Choices JS needs (`choices__*`, `is-*`).
+   */
+  customDaisyClassNames = {
+    ...DAISY_CLASS_NAMES,
+    containerOuter: [
+      'choices',
+      'w-full',
+      'relative',
+      'choices-ember--daisy',
+      'ring-2',
+      'ring-secondary/40',
+      'rounded-box',
+    ],
+    containerInner: [
+      'choices__inner',
+      'input',
+      'input-bordered',
+      'input-secondary',
+      'w-full',
+      'min-h-12',
+      'h-auto',
+      'flex',
+      'flex-wrap',
+      'items-center',
+      'gap-1',
+      'py-2',
+    ],
+    listDropdown: [
+      'choices__list--dropdown',
+      'menu',
+      'bg-secondary',
+      'text-secondary-content',
+      'rounded-box',
+      'shadow-xl',
+      'border',
+      'border-secondary',
+      'z-[100]',
+      'p-1',
+      'mt-1',
+    ],
+    highlightedState: [
+      'is-highlighted',
+      'bg-accent',
+      'text-accent-content',
+    ],
+    button: [
+      'choices__button',
+      'btn',
+      'btn-circle',
+      'btn-ghost',
+      'btn-xs',
+      'min-h-0',
+      'h-5',
+      'w-5',
+      'p-0',
+    ],
+  };
+
+  /** Stable @config bag for the override demo (classNames is recreate-key). */
+  customDaisyConfig = {
+    classNames: this.customDaisyClassNames,
+    searchEnabled: true,
+  };
+
+  @tracked stockDaisyValue: string | null = null;
+  @tracked customDaisyValue: string | null = null;
+  @tracked customDaisyMulti: string[] = [];
+
+  onStockDaisy = (v: string | string[] | null) => {
+    this.stockDaisyValue = v as string | null;
+  };
+  onCustomDaisy = (v: string | string[] | null) => {
+    this.customDaisyValue = v as string | null;
+  };
+  onCustomDaisyMulti = (v: string | string[] | null) => {
+    this.customDaisyMulti = Array.isArray(v) ? v : [];
+  };
 
   onDaisyThemeChange = (v: string | string[] | null) => {
     const next = (typeof v === 'string' ? v : null) as DaisyTheme | null;
@@ -445,6 +527,70 @@ export default class ApplicationTemplate extends Component {
         {{else}}
           <p class='text-sm opacity-60'>Select someone to open the form.</p>
         {{/if}}
+      </section>
+
+      <section class='space-y-3'>
+        <h2 class='text-lg font-semibold'>Override daisy classNames</h2>
+        <p class='text-sm opacity-70'>
+          Import
+          <code>DAISY_CLASS_NAMES</code>
+          from
+          <code>choices-ember</code>, spread it, replace slots you care about,
+          pass via
+          <code>@config.classNames</code>. Keep
+          <code>@theme="daisy"</code>
+          for CSS vars +
+          <code>choices-ember--daisy</code>.
+        </p>
+        <div class='grid gap-4 sm:grid-cols-2'>
+          <div class='space-y-2'>
+            <p class='text-sm font-medium'>Stock
+              <code>@theme="daisy"</code></p>
+            <Choices
+              @type='single'
+              @theme='daisy'
+              @options={{CITIES}}
+              @value={{this.stockDaisyValue}}
+              @onChange={{this.onStockDaisy}}
+              @placeholder='Default daisy preset'
+              @class='w-full'
+            />
+          </div>
+          <div class='space-y-2'>
+            <p class='text-sm font-medium'>Custom
+              <code>classNames</code>
+              (secondary ring, accent highlight)</p>
+            <Choices
+              @type='single'
+              @theme='daisy'
+              @options={{CITIES}}
+              @value={{this.customDaisyValue}}
+              @onChange={{this.onCustomDaisy}}
+              @config={{this.customDaisyConfig}}
+              @placeholder='Overridden classNames'
+              @class='w-full'
+            />
+          </div>
+        </div>
+        <div class='space-y-2'>
+          <p class='text-sm font-medium'>Multi + custom remove button
+            (<code>btn-circle</code>)</p>
+          <Choices
+            @type='multiple'
+            @theme='daisy'
+            @options={{CITIES}}
+            @value={{this.customDaisyMulti}}
+            @onChange={{this.onCustomDaisyMulti}}
+            @config={{this.customDaisyConfig}}
+            @class='w-full'
+          />
+        </div>
+        <p class='text-xs opacity-70 font-mono'>
+          import &#123; DAISY_CLASS_NAMES &#125; from 'choices-ember';
+          then
+          @config=&#123;&#123; this.customDaisyConfig &#125;&#125;
+          where classNames spreads the preset and replaces slots.
+        </p>
       </section>
 
       <section class='space-y-4'>
