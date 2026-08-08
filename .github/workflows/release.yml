@@ -1,19 +1,18 @@
 # Publish choices-ember to npm when a version tag is pushed.
 #
 # Auth: npm Trusted Publishing (OIDC) — no NPM_TOKEN, no OTP in CI.
-# npm recommends this over “Bypass 2FA” granular tokens.
 #
-# One-time setup (package must exist on npm first — see README if not):
-#   npmjs.com → choices-ember → Settings → Trusted Publisher → GitHub Actions
-#     Organization or user:  ultish
-#     Repository:            choices-ember
-#     Workflow filename:     release.yml
-#     Allowed actions:       npm publish
+# One-time on npmjs.com (package Settings → Trusted Publisher → GitHub Actions):
+#   Organization or user:  ultish
+#   Repository:            choices-ember
+#   Workflow filename:     release.yml   ← filename only, not a path
+#   Environment name:      (leave empty unless you use a GitHub Environment)
+#   Allowed actions:       npm publish
 #
-# Release:
-#   Bump choices-ember/package.json version, commit, then:
-#     git tag v0.1.1 && git push origin v0.1.1
-#   Tag must match package.json (v0.1.1 ↔ 0.1.1).
+# package.json repository.url must match the GitHub repo (see choices-ember/package.json).
+#
+# Release: bump choices-ember/package.json version, commit, then:
+#   git tag vX.Y.Z && git push origin vX.Y.Z
 name: Release
 
 on:
@@ -29,7 +28,6 @@ on:
 
 permissions:
   contents: read
-  # Required for OIDC trusted publishing (+ automatic provenance)
   id-token: write
 
 concurrency:
@@ -41,6 +39,9 @@ jobs:
     name: Publish choices-ember
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -50,11 +51,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           # Trusted publishing: Node >= 22.14 and npm >= 11.5.1
-          node-version: 22
-          cache: pnpm
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
-          # Avoid stale caches in release builds
-          package-manager-cache: false
+          cache: pnpm
+
+      - name: Ensure modern npm (OIDC trusted publishing)
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -68,7 +70,6 @@ jobs:
           echo "tag=$TAG package.json=$PKG"
           if [ "$TAG" != "$PKG" ]; then
             echo "::error::Tag v$TAG does not match choices-ember/package.json version $PKG"
-            echo "Bump package.json, commit, then retag."
             exit 1
           fi
 
@@ -97,13 +98,12 @@ jobs:
         run: |
           set -euo pipefail
           echo "npm $(npm --version) node $(node --version)"
-          # No NODE_AUTH_TOKEN — npm CLI uses GitHub OIDC when id-token: write is set.
-          # Provenance is generated automatically with trusted publishing.
-          # --access public: unscoped package on free accounts
+          # No NODE_AUTH_TOKEN — OIDC via id-token: write
+          # 404 on PUT usually means Trusted Publisher config mismatch
+          # (wrong workflow filename, user/repo, or repository.url)
           npm publish --access public
 
       - name: Dry-run notice
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run != false
         run: |
           echo "Dry run complete — tarball built, nothing published."
-          echo "Uncheck dry_run (or push a v* tag) to publish."
