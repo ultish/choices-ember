@@ -6,6 +6,7 @@ import {
   render,
   settled,
   triggerKeyEvent,
+  waitUntil,
 } from '@ember/test-helpers';
 import { tracked } from '@glimmer/tracking';
 import Choices from 'choices-ember/components/choices';
@@ -47,13 +48,49 @@ function textInput(): HTMLInputElement {
   return el;
 }
 
-async function addTag(text: string): Promise<void> {
+function dropdownIsOpen(): boolean {
+  return (
+    document.querySelector('.choices.is-open') != null ||
+    document.querySelector('.choices__list--dropdown.is-active') != null ||
+    document.querySelector('.choices__list[aria-expanded="true"]') != null
+  );
+}
+
+/**
+ * Add a text-mode tag via the Choices UI.
+ *
+ * Choices 11 only commits on Enter when the dropdown is active
+ * (`_onEnterKey` early-outs for text if !hasActiveDropdown). Typing must
+ * open the “Press Enter to add” notice first — wait for that, then Enter.
+ *
+ * Use waitForTag=false when asserting rejection (e.g. maxItemCount).
+ */
+async function addTag(
+  text: string,
+  { waitForTag = true }: { waitForTag?: boolean } = {},
+): Promise<void> {
   const input = textInput();
-  // Focus first so Choices opens the text "add" UI; Enter only commits when
-  // the dropdown/input path is active (Choices 11).
-  input.focus();
+  await click(input);
   await fillIn(input, text);
+  // Ensure Choices saw the value (fillIn can race with its input listener)
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+
+  // Dropdown opens when Choices can create an item (“Press Enter to add”).
+  // At maxItemCount it often stays closed — only require open when we expect success.
+  if (waitForTag) {
+    if (!dropdownIsOpen()) {
+      input.dispatchEvent(
+        new InputEvent('input', { bubbles: true, data: text }),
+      );
+    }
+    await waitUntil(() => dropdownIsOpen(), { timeout: 2000 });
+  }
+
   await triggerKeyEvent(input, 'keydown', 'Enter');
+
+  if (waitForTag) {
+    await waitUntil(() => tagValues().includes(text), { timeout: 2000 });
+  }
 }
 
 module('Integration | Component | Choices | text', function (hooks) {
@@ -129,8 +166,7 @@ module('Integration | Component | Choices | text', function (hooks) {
     assert.strictEqual(ctx.tags.length, 2, 'starts at maxItemCount');
     assert.deepEqual(tagValues().sort(), ['one', 'two']);
 
-    await addTag('three');
-    await settled();
+    await addTag('three', { waitForTag: false });
 
     assert.strictEqual(
       ctx.tags.length,
