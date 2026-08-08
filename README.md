@@ -425,12 +425,28 @@ ROOT_URL=/choices-ember/ pnpm --filter test-app build
 
 Releases run on **version tags** via [`.github/workflows/release.yml`](./.github/workflows/release.yml) (not on every `main` push).
 
-**One-time setup**
+**Important:** CI cannot enter an authenticator OTP. A normal “2FA publish” token will fail with `EOTP`.
 
-1. [npmjs.com](https://www.npmjs.com/) → Access Tokens → create a **granular** token with read/write for package `choices-ember` (or create-package permission for the first publish).
-2. GitHub repo → **Settings → Secrets and variables → Actions** → `NPM_TOKEN` = that token.
+#### Auth option A — Granular token with Bypass 2FA (simplest first publish)
 
-**Cut a release**
+1. [npmjs.com → Access Tokens](https://www.npmjs.com/settings/~/tokens) → **Generate New Token** → **Granular Access Token**
+2. Permissions: **Read and write** for package `choices-ember` (or permission to **create** packages if it does not exist yet)
+3. Check **Bypass two-factor authentication** (required for GitHub Actions)
+4. GitHub → **Settings → Secrets and variables → Actions** → `NPM_TOKEN` = that token
+5. Re-run **Actions → Release → v0.1.0 → Re-run failed jobs**
+
+#### Auth option B — Trusted Publishing / OIDC (no long-lived token)
+
+After the package exists on npm once:
+
+1. npmjs.com → **choices-ember** → **Settings → Trusted Publisher** → GitHub Actions  
+   - User/org: `ultish`  
+   - Repo: `choices-ember`  
+   - Workflow filename: `release.yml` (filename only)  
+   - Allow: `npm publish`
+2. You can remove `NPM_TOKEN` — the workflow uses OIDC (`id-token: write`)
+
+#### Cut a release
 
 ```bash
 # 1. Bump version in choices-ember/package.json (e.g. 0.1.0)
@@ -439,7 +455,7 @@ git tag v0.1.0          # must match package.json without the "v"
 git push origin v0.1.0  # triggers Release workflow → npm publish
 ```
 
-The workflow: installs → checks tag ≡ `package.json` version → lint → test → pack → `pnpm publish` from `choices-ember/`.
+The workflow: install → tag ≡ version check → lint → test → pack → `npm publish` from `choices-ember/`.
 
 Dry-run without publishing: **Actions → Release → Run workflow** (dry_run checked).
 
