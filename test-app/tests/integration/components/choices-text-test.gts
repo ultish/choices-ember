@@ -18,7 +18,11 @@ class TextContext {
   onChange = (value: string | string[] | null) => {
     this.onChangeCount++;
     this.lastChange = value;
-    this.tags = Array.isArray(value) ? value : value == null ? [] : [String(value)];
+    this.tags = Array.isArray(value)
+      ? value
+      : value == null
+        ? []
+        : [String(value)];
   };
 }
 
@@ -48,11 +52,8 @@ async function addTag(text: string): Promise<void> {
   // Focus first so Choices opens the text "add" UI; Enter only commits when
   // the dropdown/input path is active (Choices 11).
   input.focus();
-  await settled();
   await fillIn(input, text);
-  await settled();
   await triggerKeyEvent(input, 'keydown', 'Enter');
-  await settled();
 }
 
 module('Integration | Component | Choices | text', function (hooks) {
@@ -64,10 +65,10 @@ module('Integration | Component | Choices | text', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='text'
+          @type="text"
           @value={{ctx.tags}}
           @onChange={{ctx.onChange}}
-          @placeholder='Add a tag'
+          @placeholder="Add a tag"
         />
       </template>,
     );
@@ -75,7 +76,10 @@ module('Integration | Component | Choices | text', function (hooks) {
     assert.dom('.choices').exists();
     await addTag('hello');
 
-    assert.ok(ctx.tags.includes('hello'), `tags include hello (got ${JSON.stringify(ctx.tags)})`);
+    assert.ok(
+      ctx.tags.includes('hello'),
+      `tags include hello (got ${JSON.stringify(ctx.tags)})`,
+    );
     assert.ok(ctx.onChangeCount >= 1, 'onChange fired');
     assert.ok(tagValues().includes('hello'), 'DOM shows tag');
   });
@@ -86,7 +90,7 @@ module('Integration | Component | Choices | text', function (hooks) {
 
     await render(
       <template>
-        <Choices @type='text' @value={{ctx.tags}} @onChange={{ctx.onChange}} />
+        <Choices @type="text" @value={{ctx.tags}} @onChange={{ctx.onChange}} />
       </template>,
     );
 
@@ -114,7 +118,7 @@ module('Integration | Component | Choices | text', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='text'
+          @type="text"
           @value={{ctx.tags}}
           @onChange={{ctx.onChange}}
           @config={{config}}
@@ -146,7 +150,7 @@ module('Integration | Component | Choices | text', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='text'
+          @type="text"
           @options={{options}}
           @value={{ctx.tags}}
           @onChange={{ctx.onChange}}
@@ -164,7 +168,7 @@ module('Integration | Component | Choices | text', function (hooks) {
 
     await render(
       <template>
-        <Choices @type='text' @value={{ctx.tags}} @onChange={{ctx.onChange}} />
+        <Choices @type="text" @value={{ctx.tags}} @onChange={{ctx.onChange}} />
       </template>,
     );
 
@@ -173,7 +177,6 @@ module('Integration | Component | Choices | text', function (hooks) {
     );
     assert.ok(removeBtn, 'remove button present for text tags');
     await click(removeBtn as Element);
-    await settled();
 
     assert.deepEqual(ctx.tags, ['keep']);
   });

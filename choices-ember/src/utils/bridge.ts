@@ -82,15 +82,17 @@ function mergeClassNames(
   if (!override) {
     return base;
   }
-  const keys = new Set([
+  const keys = new Set<string>([
     ...Object.keys(base),
     ...Object.keys(override),
-  ]) as Set<keyof ClassNames>;
-  const result = { ...base } as ClassNames;
+  ]);
+  const result: ClassNames = { ...base };
   for (const key of keys) {
-    const o = override[key];
+    const k = key as keyof ClassNames;
+    const o = override[k];
     if (o !== undefined) {
-      result[key] = o as ClassNames[typeof key];
+      // Per-key replace (Choices shallow-merges classNames slots)
+      Object.assign(result, { [k]: o });
     }
   }
   return result;
@@ -149,7 +151,7 @@ function buildConfig(args: BridgeArgs): Partial<ChoicesConfig> {
       outerList.push('choices');
     }
     merged.classNames = {
-      ...(existing as ClassNames),
+      ...existing,
       containerOuter: [
         ...outerList,
         ...args.class.split(/\s+/).filter(Boolean),
@@ -224,7 +226,11 @@ export function createBridge(
       currentArgs.onChange?.(normalizeSingleFromGetValue(raw));
     } else {
       currentArgs.onChange?.(
-        Array.isArray(raw) ? raw.map(String) : raw == null || raw === '' ? [] : [String(raw)],
+        Array.isArray(raw)
+          ? raw.map(String)
+          : raw == null || raw === ''
+            ? []
+            : [String(raw)],
       );
     }
   };
@@ -249,8 +255,9 @@ export function createBridge(
     if (syncing) {
       return;
     }
-    const detail = (event as CustomEvent<{ value: string; resultCount: number }>)
-      .detail;
+    const detail = (
+      event as CustomEvent<{ value: string; resultCount: number }>
+    ).detail;
     currentArgs.onSearch?.(detail);
   };
 
@@ -347,7 +354,8 @@ export function createBridge(
       // replaceChoices + replaceItems so selected display labels update when
       // nested option fields change. Never refresh() for Ember option updates.
       // Controlled @value is re-applied immediately after.
-      instance.setChoices(mapped, 'value', 'label', true, true, true);
+      // Choices may return a Promise; bridge sync is fire-and-forget under syncing
+      void instance.setChoices(mapped, 'value', 'label', true, true, true);
     } finally {
       syncing = false;
     }
@@ -380,7 +388,7 @@ export function createBridge(
     if ((args.type ?? 'single') !== 'text') {
       syncing = true;
       try {
-        instance.setChoices(mapped, 'value', 'label', true, true, true);
+        void instance.setChoices(mapped, 'value', 'label', true, true, true);
       } finally {
         syncing = false;
       }
@@ -429,7 +437,8 @@ export function createBridge(
       const config = buildConfig(args);
       const recreateFp = fingerprintRecreate(config, args.theme);
       const type = args.type ?? 'single';
-      const forceSync = args.syncKey !== undefined && args.syncKey !== lastSyncKey;
+      const forceSync =
+        args.syncKey !== undefined && args.syncKey !== lastSyncKey;
 
       if (!instance) {
         init(args);

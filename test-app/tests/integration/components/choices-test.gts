@@ -59,22 +59,30 @@ module('Integration | Component | Choices', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
-          @placeholder='Pick one'
+          @placeholder="Pick one"
         />
       </template>,
     );
 
-    assert.strictEqual(selectedLabel(), 'One', 'initial controlled value shown');
+    assert.strictEqual(
+      selectedLabel(),
+      'One',
+      'initial controlled value shown',
+    );
     const changesAfterRender = ctx.onChangeCount;
 
     ctx.selected = '2';
     await settled();
 
-    assert.strictEqual(selectedLabel(), 'Two', 'UI updates when @value changes');
+    assert.strictEqual(
+      selectedLabel(),
+      'Two',
+      'UI updates when @value changes',
+    );
     assert.strictEqual(
       ctx.onChangeCount,
       changesAfterRender,
@@ -89,7 +97,7 @@ module('Integration | Component | Choices', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -128,7 +136,7 @@ module('Integration | Component | Choices', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -165,7 +173,7 @@ module('Integration | Component | Choices', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -177,12 +185,14 @@ module('Integration | Component | Choices', function (hooks) {
 
     await clearRender();
 
-    assert.dom('.choices').doesNotExist('Choices container removed after clear');
+    assert
+      .dom('.choices')
+      .doesNotExist('Choices container removed after clear');
     // No leftover errors — if destroy failed, subsequent remount would throw
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -211,7 +221,7 @@ module('Integration | Component | Choices', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -228,13 +238,16 @@ module('Integration | Component | Choices', function (hooks) {
     ).find((el) => el.textContent?.trim() === 'Two');
     assert.ok(choice, 'found Two choice');
     await click(choice as Element);
-    await settled();
 
     assert.strictEqual(ctx.selected, '2');
     assert.strictEqual(selectedLabel(), 'Two');
-    assert.ok(
-      ctx.onChangeCount >= 1 && ctx.onChangeCount < 10,
-      `onChange fired a bounded number of times (got ${ctx.onChangeCount})`,
+    assert.true(
+      ctx.onChangeCount >= 1,
+      `onChange fired at least once (got ${ctx.onChangeCount})`,
+    );
+    assert.true(
+      ctx.onChangeCount < 10,
+      `onChange stayed bounded (got ${ctx.onChangeCount})`,
     );
     assert.ok(maxSafe > 0, 'did not hit infinite loop safety limit');
   });

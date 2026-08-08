@@ -1,11 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'test-app/tests/helpers';
-import {
-  click,
-  clearRender,
-  render,
-  settled,
-} from '@ember/test-helpers';
+import { click, clearRender, render, settled } from '@ember/test-helpers';
 import { tracked } from '@glimmer/tracking';
 import Choices from 'choices-ember/components/choices';
 import type { ChoicesOption, ChoicesPublicAPI } from 'choices-ember';
@@ -84,7 +79,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -104,7 +99,6 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
       ),
     ).find((el) => el.textContent?.trim() === 'Apple');
     await click(apple as Element);
-    await settled();
 
     assert.strictEqual(ctx.selected, 'apple');
     assert.strictEqual(selectedLabel(), 'Apple');
@@ -118,7 +112,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -145,7 +139,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -169,7 +163,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -178,11 +172,11 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     );
 
     await click('.choices');
-    assert.ok(
-      choiceLabels().length === 0 ||
-        choiceLabels().every((l) => /no choices|loading/i.test(l)),
-      'empty before load',
-    );
+    const beforeLoad = choiceLabels();
+    const emptyOrNotice =
+      beforeLoad.length === 0 ||
+      beforeLoad.every((l) => /no choices|loading/i.test(l));
+    assert.true(emptyOrNotice, 'empty or loading notice before load');
 
     // Simulate Ember async load completing
     await Promise.resolve();
@@ -208,11 +202,11 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
-          @placeholder='Waiting…'
+          @placeholder="Waiting…"
         />
       </template>,
     );
@@ -256,7 +250,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -277,7 +271,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -303,7 +297,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -344,18 +338,15 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
           'input-bordered',
           'test-override-inner',
         ],
-        listDropdown: [
-          'choices__list--dropdown',
-          'test-override-dropdown',
-        ],
+        listDropdown: ['choices__list--dropdown', 'test-override-dropdown'],
       },
     } as Partial<ChoicesConfig>;
 
     await render(
       <template>
         <Choices
-          @type='single'
-          @theme='daisy'
+          @type="single"
+          @theme="daisy"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -396,7 +387,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -434,7 +425,7 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -461,11 +452,11 @@ module('Integration | Component | Choices | phase 4', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
-          @name='station'
+          @name="station"
           required
         />
       </template>,

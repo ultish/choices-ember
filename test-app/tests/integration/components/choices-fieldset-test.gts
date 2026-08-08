@@ -30,9 +30,9 @@ module('Integration | Component | ChoicesFieldset', function (hooks) {
     await render(
       <template>
         <ChoicesFieldset
-          @legend='Charge code'
-          @description='Search by name or id'
-          @type='single'
+          @legend="Charge code"
+          @description="Search by name or id"
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -52,7 +52,7 @@ module('Integration | Component | ChoicesFieldset', function (hooks) {
     await render(
       <template>
         <ChoicesFieldset
-          @type='single'
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -74,8 +74,8 @@ module('Integration | Component | ChoicesFieldset', function (hooks) {
     await render(
       <template>
         <ChoicesFieldset
-          @legend='Pick'
-          @type='single'
+          @legend="Pick"
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -95,8 +95,8 @@ module('Integration | Component | ChoicesFieldset', function (hooks) {
     await render(
       <template>
         <ChoicesFieldset
-          @label='Station'
-          @type='single'
+          @label="Station"
+          @type="single"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}

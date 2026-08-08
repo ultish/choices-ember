@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /*
  * Sticky cookbook header covers in-page #anchors unless we reserve space.
@@ -63,8 +63,8 @@ html {
  * Unlayered Choices CSS always beats `@layer utilities`, so classNames
  * overrides (input-primary, rounded-2xl, bg-primary, …) appear to "do nothing".
  */
-@import 'choices.js/public/assets/styles/choices.css' layer(components);
-@import 'choices-ember/styles/daisyui-theme.css' layer(components);
+@import "choices.js/public/assets/styles/choices.css" layer(components);
+@import "choices-ember/styles/daisyui-theme.css" layer(components);
 
 /*
  * Tailwind content: classic Ember + workspace addon source so daisy

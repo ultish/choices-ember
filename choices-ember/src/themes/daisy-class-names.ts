@@ -74,11 +74,7 @@ export const DAISY_CLASS_NAMES: ClassNames = {
   focusState: ['is-focused'],
   openState: ['is-open'],
   disabledState: ['is-disabled', 'opacity-60'],
-  highlightedState: [
-    'is-highlighted',
-    'bg-primary',
-    'text-primary-content',
-  ],
+  highlightedState: ['is-highlighted', 'bg-primary', 'text-primary-content'],
   selectedState: ['is-selected'],
   flippedState: ['is-flipped'],
   loadingState: ['is-loading'],

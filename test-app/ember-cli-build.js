@@ -12,7 +12,11 @@ module.exports = function (defaults) {
       compile: {
         enabled: true,
         includePaths: ['app'],
-        cacheInclude: [/.*\.(css|scss|sass|less)$/, /.postcssrc/, /postcss.config.*$/],
+        cacheInclude: [
+          /.*\.(css|scss|sass|less)$/,
+          /.postcssrc/,
+          /postcss.config.*$/,
+        ],
         plugins: [
           {
             module: require('@tailwindcss/postcss'),

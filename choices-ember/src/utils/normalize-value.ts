@@ -3,11 +3,24 @@
  * Stable `setChoiceByValue` / comparisons.
  */
 
-export function normalizeValue(value: unknown): string | null {
+function asBoundaryString(value: unknown): string | null {
   if (value == null || value === '') {
     return null;
   }
-  return String(value);
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    typeof value === 'bigint'
+  ) {
+    return String(value);
+  }
+  // Objects / symbols are not valid choice values — drop them
+  return null;
+}
+
+export function normalizeValue(value: unknown): string | null {
+  return asBoundaryString(value);
 }
 
 export function normalizeValues(value: unknown): string[] {
@@ -15,7 +28,9 @@ export function normalizeValues(value: unknown): string[] {
     return [];
   }
   if (Array.isArray(value)) {
-    return value.map((v) => String(v)).filter((v) => v !== '');
+    return value
+      .map((v) => asBoundaryString(v))
+      .filter((v): v is string => v != null && v !== '');
   }
   const single = normalizeValue(value);
   return single == null ? [] : [single];
@@ -32,7 +47,7 @@ export function normalizeSingleFromGetValue(raw: unknown): string | null {
     if (raw.length === 0) {
       return null;
     }
-    return String(raw[0]);
+    return asBoundaryString(raw[0]);
   }
-  return String(raw);
+  return asBoundaryString(raw);
 }

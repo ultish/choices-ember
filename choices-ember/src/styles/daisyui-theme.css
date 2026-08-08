@@ -41,7 +41,8 @@
 /* Focus roughly aligned with daisy input-bordered */
 .choices.choices-ember--daisy.is-focused .choices__inner,
 .choices.choices-ember--daisy.is-open .choices__inner {
-  outline: 2px solid color-mix(in oklab, var(--color-primary, #005f75) 40%, transparent);
+  outline: 2px solid
+    color-mix(in oklab, var(--color-primary, #005f75) 40%, transparent);
   outline-offset: 2px;
 }
 

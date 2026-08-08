@@ -19,15 +19,27 @@ class MultiContext {
   onChange = (value: string | string[] | null) => {
     this.onChangeCount++;
     this.lastChange = value;
-    this.selected = Array.isArray(value) ? value : value == null ? [] : [String(value)];
+    this.selected = Array.isArray(value)
+      ? value
+      : value == null
+        ? []
+        : [String(value)];
   };
 
   onAdd = (detail: { value?: unknown }) => {
-    this.lastAdd = detail?.value != null ? String(detail.value) : undefined;
+    this.lastAdd =
+      detail?.value != null &&
+      (typeof detail.value === 'string' || typeof detail.value === 'number')
+        ? String(detail.value)
+        : undefined;
   };
 
   onRemove = (detail: { value?: unknown }) => {
-    this.lastRemove = detail?.value != null ? String(detail.value) : undefined;
+    this.lastRemove =
+      detail?.value != null &&
+      (typeof detail.value === 'string' || typeof detail.value === 'number')
+        ? String(detail.value)
+        : undefined;
   };
 }
 
@@ -53,7 +65,9 @@ function selectedItemLabels(): string[] {
 
 function selectedValuesFromDom(): string[] {
   return Array.from(
-    document.querySelectorAll('.choices__list--multiple .choices__item[data-value]'),
+    document.querySelectorAll(
+      '.choices__list--multiple .choices__item[data-value]',
+    ),
   )
     .map((el) => el.getAttribute('data-value') ?? '')
     .filter(Boolean);
@@ -74,7 +88,6 @@ async function pickChoiceByLabel(label: string): Promise<void> {
     throw new Error(`Choice not found: ${label}`);
   }
   await click(choice);
-  await settled();
 }
 
 module('Integration | Component | Choices | multiple', function (hooks) {
@@ -86,7 +99,7 @@ module('Integration | Component | Choices | multiple', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='multiple'
+          @type="multiple"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -120,7 +133,7 @@ module('Integration | Component | Choices | multiple', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='multiple'
+          @type="multiple"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -153,7 +166,7 @@ module('Integration | Component | Choices | multiple', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='multiple'
+          @type="multiple"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -169,7 +182,6 @@ module('Integration | Component | Choices | multiple', function (hooks) {
     );
     assert.ok(removeBtn, 'remove button present (default removeItemButton)');
     await click(removeBtn as Element);
-    await settled();
 
     assert.deepEqual(ctx.selected, ['2'], 'remaining value after remove');
     assert.deepEqual(selectedValuesFromDom(), ['2']);
@@ -184,7 +196,7 @@ module('Integration | Component | Choices | multiple', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='multiple'
+          @type="multiple"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -205,7 +217,7 @@ module('Integration | Component | Choices | multiple', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='multiple'
+          @type="multiple"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}
@@ -291,7 +303,7 @@ module('Integration | Component | Choices | multiple', function (hooks) {
     await render(
       <template>
         <Choices
-          @type='multiple'
+          @type="multiple"
           @options={{ctx.options}}
           @value={{ctx.selected}}
           @onChange={{ctx.onChange}}

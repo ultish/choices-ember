@@ -1,10 +1,7 @@
 import Component from '@glimmer/component';
 import { guidFor } from '@ember/object/internals';
 import type ChoicesInstance from 'choices.js';
-import type {
-  EventChoice,
-  Options as ChoicesConfig,
-} from 'choices.js';
+import type { EventChoice, Options as ChoicesConfig } from 'choices.js';
 
 import Choices, {
   type ChoicesMode,
@@ -71,7 +68,9 @@ export default class ChoicesFieldset extends Component<ChoicesFieldsetSignature>
   }
 
   get fieldsetClassList(): string {
-    return ['fieldset', this.args.fieldsetClass ?? ''].filter(Boolean).join(' ');
+    return ['fieldset', this.args.fieldsetClass ?? '']
+      .filter(Boolean)
+      .join(' ');
   }
 
   <template>
@@ -80,14 +79,14 @@ export default class ChoicesFieldset extends Component<ChoicesFieldsetSignature>
       disabled={{@disabled}}
       ...attributes
     >
-      {{#if (has-block 'legend')}}
-        <legend class='fieldset-legend'>{{yield to='legend'}}</legend>
+      {{#if (has-block "legend")}}
+        <legend class="fieldset-legend">{{yield to="legend"}}</legend>
       {{else if @legend}}
-        <legend class='fieldset-legend'>{{@legend}}</legend>
+        <legend class="fieldset-legend">{{@legend}}</legend>
       {{/if}}
 
       {{#if @label}}
-        <label class='label' for={{this.inputId}}>{{@label}}</label>
+        <label class="label" for={{this.inputId}}>{{@label}}</label>
       {{/if}}
 
       <Choices
@@ -112,10 +111,10 @@ export default class ChoicesFieldset extends Component<ChoicesFieldsetSignature>
         @class={{this.outerClass}}
       />
 
-      {{#if (has-block 'description')}}
-        <p class='label'>{{yield to='description'}}</p>
+      {{#if (has-block "description")}}
+        <p class="label">{{yield to="description"}}</p>
       {{else if @description}}
-        <p class='label'>{{@description}}</p>
+        <p class="label">{{@description}}</p>
       {{/if}}
     </fieldset>
   </template>

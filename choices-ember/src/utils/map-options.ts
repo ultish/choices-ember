@@ -12,6 +12,20 @@ function isGroup(option: ChoicesOption): option is InputGroup {
   );
 }
 
+function toLabelText(label: unknown): string {
+  if (label == null) {
+    return '';
+  }
+  if (
+    typeof label === 'string' ||
+    typeof label === 'number' ||
+    typeof label === 'boolean'
+  ) {
+    return String(label);
+  }
+  return '';
+}
+
 /**
  * Map Ember/domain option objects to plain Choices InputChoice / InputGroup
  * snapshots. **Reads** value, label, disabled, selected, placeholder,
@@ -38,8 +52,8 @@ export function mapOptions(
       return {
         ...(groupId !== undefined ? { id: groupId } : {}),
         ...(groupActive !== undefined ? { active: groupActive } : {}),
-        label: groupLabel != null ? String(groupLabel) : '',
-        value: groupValue != null ? String(groupValue) : '',
+        label: toLabelText(groupLabel),
+        value: normalizeValue(groupValue) ?? '',
         disabled: Boolean(groupDisabled),
         choices: childChoices.map(mapChoice),
       } satisfies InputGroup;
@@ -52,7 +66,7 @@ export function mapOptions(
 function mapChoice(choice: InputChoice): InputChoice {
   // Explicit reads for autotracking on nested tracked domain objects
   const value = normalizeValue(choice.value) ?? '';
-  const label = choice.label != null ? String(choice.label) : '';
+  const label = toLabelText(choice.label);
   const disabled = Boolean(choice.disabled);
   const selected = Boolean(choice.selected);
   const placeholder = Boolean(choice.placeholder);

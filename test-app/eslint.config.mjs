@@ -112,6 +112,7 @@ export default ts.config(
       'testem.js',
       'testem*.js',
       'index.js',
+      'postcss.config.js',
       '.prettierrc.js',
       '.stylelintrc.js',
       '.template-lintrc.js',
