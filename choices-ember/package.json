@@ -85,7 +85,6 @@
     "babel-plugin-ember-template-compilation": "^2.2.5",
     "choices.js": "^11.0.0",
     "concurrently": "^9.0.1",
-    "ember-source": "^6.0.0",
     "ember-template-lint": "^6.0.0",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",

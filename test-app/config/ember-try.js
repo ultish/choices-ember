@@ -4,11 +4,8 @@ const getChannelURL = require('ember-source-channel-url');
 const { embroiderSafe, embroiderOptimized } = require('@embroider/test-setup');
 
 /**
- * Support matrix matches peer `ember-source: ">= 6.0.0"`.
- *
- * Ember 7 (release/beta/canary) currently fails: host components do not
- * paint Choices DOM (no `.choices` / fieldset). Track separately — do not
- * fail CI until the addon is ported/verified on 7.
+ * Peer: ember-source >= 6.0.0
+ * CI matrix must use a single ember-source per scenario (no nested addon copy).
  */
 module.exports = async function () {
   return {
@@ -30,11 +27,9 @@ module.exports = async function () {
           },
         },
       },
-      // test-app default is ~6.12 (current LTS) — covered by main CI jobs
+      // test-app default ~6.12 covered by main Tests job
       {
         name: 'ember-release',
-        // Ember 7.x — allowedToFail until Choices bridge renders under 7
-        allowedToFail: true,
         npm: {
           devDependencies: {
             'ember-source': await getChannelURL('release'),
@@ -43,7 +38,6 @@ module.exports = async function () {
       },
       {
         name: 'ember-beta',
-        allowedToFail: true,
         npm: {
           devDependencies: {
             'ember-source': await getChannelURL('beta'),
@@ -52,7 +46,6 @@ module.exports = async function () {
       },
       {
         name: 'ember-canary',
-        allowedToFail: true,
         npm: {
           devDependencies: {
             'ember-source': await getChannelURL('canary'),
