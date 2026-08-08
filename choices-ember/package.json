@@ -1,6 +1,6 @@
 {
   "name": "choices-ember",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Ember v2 addon: reactive Choices.js bridge with optional daisyUI fieldset chrome",
   "keywords": [
     "ember-addon",
@@ -8,9 +8,21 @@
     "select",
     "glimmer"
   ],
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ultish/choices-ember.git",
+    "directory": "choices-ember"
+  },
+  "homepage": "https://github.com/ultish/choices-ember#readme",
+  "bugs": {
+    "url": "https://github.com/ultish/choices-ember/issues"
+  },
   "license": "MIT",
   "author": "",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "exports": {
     ".": {
       "types": "./declarations/index.d.ts",

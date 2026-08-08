@@ -421,6 +421,28 @@ Local production build with the same base path:
 ROOT_URL=/choices-ember/ pnpm --filter test-app build
 ```
 
+### Publishing to npm
+
+Releases run on **version tags** via [`.github/workflows/release.yml`](./.github/workflows/release.yml) (not on every `main` push).
+
+**One-time setup**
+
+1. [npmjs.com](https://www.npmjs.com/) → Access Tokens → create a **granular** token with read/write for package `choices-ember` (or create-package permission for the first publish).
+2. GitHub repo → **Settings → Secrets and variables → Actions** → `NPM_TOKEN` = that token.
+
+**Cut a release**
+
+```bash
+# 1. Bump version in choices-ember/package.json (e.g. 0.1.0)
+# 2. Commit on main
+git tag v0.1.0          # must match package.json without the "v"
+git push origin v0.1.0  # triggers Release workflow → npm publish
+```
+
+The workflow: installs → checks tag ≡ `package.json` version → lint → test → pack → `pnpm publish` from `choices-ember/`.
+
+Dry-run without publishing: **Actions → Release → Run workflow** (dry_run checked).
+
 ---
 
 ## Changelog
