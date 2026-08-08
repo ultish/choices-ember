@@ -9,6 +9,8 @@ Choices owns the widget DOM. Ember owns your tracked data. The addon snapshots o
 
 **Requirements:** Ember 6+, Choices.js 11+, TypeScript / `.gts` recommended.
 
+**Live cookbook:** [ultish.github.io/choices-ember](https://ultish.github.io/choices-ember/)
+
 ---
 
 ## Install
@@ -22,7 +24,7 @@ pnpm add choices-ember choices.js
 
 | Package | Required | Notes |
 |---------|----------|--------|
-| `ember-source` | `>= 6` | Ember **6** and **7** (release/beta/canary) covered by ember-try CI |
+| `ember-source` | `>= 6` | |
 | `choices.js` | `^11` | Widget runtime + stock CSS |
 | `tailwindcss` | optional `>= 4` | Only for `@theme="daisy"` / `<ChoicesFieldset>` |
 | `daisyui` | optional `>= 5` | Same — **not** bundled by the addon |
@@ -57,8 +59,6 @@ The app owns the Tailwind + daisyUI pipeline. The addon only ships a **CSS varia
 
 /* so daisy/Tailwind classes in the addon preset are not purged */
 @source "../node_modules/choices-ember/dist/**/*.js";
-/* monorepo source alternative: */
-/* @source "../../choices-ember/src/**/*.{gts,ts}"; */
 ```
 
 | Import | Layer |
@@ -182,9 +182,6 @@ get choiceOptions() {
     label: p.name, // tracked read → dropdown updates when name changes
   }));
 }
-
-// After form submit:
-// person.name = this.draftName;  // selection id stays; label updates
 ```
 
 ```hbs
@@ -215,7 +212,7 @@ async load() {
 }
 ```
 
-There is no built-in fetcher `@options` function; loading UI is the app’s job.
+There is no built-in fetcher; loading UI is the app’s job.
 
 ---
 
@@ -396,79 +393,6 @@ import {
 
 ---
 
-## Local development
-
-This monorepo: `choices-ember/` (addon) + `test-app/` (demos + tests).
-
-```bash
-pnpm install
-pnpm start          # addon watch + test-app
-pnpm test:ember
-```
-
-The **test-app is the cookbook**: each demo is a live control plus a **How to build this** recipe (not a Choices.js-style mystery gallery). See [docs/COOKBOOK.md](./docs/COOKBOOK.md) for the section index.
-
-### Demo (GitHub Pages)
-
-On push to `main`, [`.github/workflows/pages.yml`](./.github/workflows/pages.yml) builds the test-app and deploys it to GitHub Pages.
-
-1. Repo **Settings → Pages → Source: GitHub Actions**
-2. After the first successful run: `https://ultish.github.io/choices-ember/`
-
-Local production build with the same base path:
-
-```bash
-ROOT_URL=/choices-ember/ pnpm --filter test-app build
-```
-
-### Publishing to npm
-
-Releases run on **version tags** via [`.github/workflows/release.yml`](./.github/workflows/release.yml) (not on every `main` push).
-
-Auth is **npm Trusted Publishing (OIDC)** — npm’s recommended path. No long-lived token, no OTP in CI, no “Bypass 2FA” token.
-
-#### One-time: first publish (package must exist on npm)
-
-Trusted Publisher is configured **on the package**, so the package has to exist once. Do that **locally** (you can enter OTP here; CI cannot):
-
-```bash
-cd choices-ember
-# ensure you're logged in: npm login
-npm publish --access public
-# enter OTP when prompted
-```
-
-If `0.1.0` is already taken by a failed attempt or you already published it, bump the version first (e.g. `0.1.1`) in `choices-ember/package.json`, commit, then publish that version.
-
-#### One-time: Trusted Publisher on npmjs.com
-
-1. Open https://www.npmjs.com/package/choices-ember → **Settings** → **Trusted Publisher**
-2. Choose **GitHub Actions** and set:
-   - **Organization or user:** `ultish`
-   - **Repository:** `choices-ember`
-   - **Workflow filename:** `release.yml` (filename only, not a path)
-   - **Allowed actions:** `npm publish`
-3. Save. You do **not** need `NPM_TOKEN` in GitHub for publish.
-
-#### Later releases (CI)
-
-```bash
-# 1. Bump version in choices-ember/package.json
-# 2. Commit on main
-git tag v0.1.1          # must match package.json without the "v"
-git push origin v0.1.1  # Actions → Release publishes via OIDC
-```
-
-The workflow: install → tag ≡ version check → lint → test → pack → `npm publish` (OIDC).
-
-Dry-run without publishing: **Actions → Release → Run workflow** (dry_run checked).
-
----
-
-## Changelog
-
-See [CHANGELOG.md](./CHANGELOG.md).
-
 ## License
 
-MIT (see [LICENSE.md](./LICENSE.md)); align with Choices / project preference when publishing.
+MIT (see [LICENSE.md](./LICENSE.md)).
