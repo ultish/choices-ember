@@ -22,7 +22,7 @@ pnpm add choices-ember choices.js
 
 | Package | Required | Notes |
 |---------|----------|--------|
-| `ember-source` | `>= 6` | |
+| `ember-source` | `>= 6` | Tested on Ember **6.x** LTS. Ember **7** (release/beta/canary) is run in CI as allowed-to-fail until the bridge is verified. |
 | `choices.js` | `^11` | Widget runtime + stock CSS |
 | `tailwindcss` | optional `>= 4` | Only for `@theme="daisy"` / `<ChoicesFieldset>` |
 | `daisyui` | optional `>= 5` | Same — **not** bundled by the addon |

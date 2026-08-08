@@ -60,13 +60,15 @@ jobs:
       fail-fast: false
       matrix:
         try-scenario:
-          - ember-lts-4.12
-          - ember-lts-5.4
+          # Peer is ember-source >= 6 (test-app default ~6.12 covered by Tests job)
+          - ember-lts-6.4
+          - ember-lts-6.8
+          - embroider-safe
+          - embroider-optimized
+          # Ember 7 channels: allowedToFail in ember-try.js (render not yet verified)
           - ember-release
           - ember-beta
           - ember-canary
-          - embroider-safe
-          - embroider-optimized
 
     steps:
       - uses: actions/checkout@v4
