@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-08-09
+
+### Fixed
+
+- **daisyUI multi/text selected chips:** pair `--color-primary` (background) with `--color-primary-content` (label text) so light primaries (e.g. bumblebee, cupcake) keep readable contrast
+- **Remove × icon** on multi/text chips: paint via CSS mask + `--color-primary-content` instead of the stock Choices SVG with hardcoded `#FFF` fill
+- Disabled multi chips use base tokens so they no longer look “selected primary”
+
+### Notes
+
+- Token pairing is documented in `docs/design/THEMING.md` (`--choices-primary-color` / `--choices-item-color`)
+
+## [0.1.2] - 2026-08-08
+
+### Fixed
+
+- npm Trusted Publishing (OIDC) release workflow: normalize `repository.url`, use a modern npm on the runner
+
+## [0.1.1] - 2026-08-08
+
+### Fixed
+
+- Release packaging / CI auth path for Trusted Publishing
+
+## [0.1.0] - 2026-08-08
+
 ### Added
 
 - Initial **Embroider v2** monorepo (`choices-ember` + `test-app`) with TypeScript and `.gts`
@@ -31,8 +57,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 
-- Package version remains `0.0.0` until first publish
 - Peers: `ember-source >= 6`, `choices.js ^11`; optional `tailwindcss >= 4`, `daisyui >= 5`
-- Out of scope for this release: low-level `{{choices}}` modifier, function `@options` fetcher, structure-only CSS, npm publish
+- Out of scope: low-level `{{choices}}` modifier, function `@options` fetcher, structure-only CSS
 
-[Unreleased]: https://github.com/jxhui/choices-ember/compare/HEAD...HEAD
+[Unreleased]: https://github.com/ultish/choices-ember/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/ultish/choices-ember/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/ultish/choices-ember/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/ultish/choices-ember/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/ultish/choices-ember/releases/tag/v0.1.0
