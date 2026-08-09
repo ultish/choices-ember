@@ -1,6 +1,6 @@
 {
   "name": "choices-ember",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Ember v2 addon: reactive Choices.js bridge with optional daisyUI fieldset chrome",
   "keywords": [
     "ember-addon",
