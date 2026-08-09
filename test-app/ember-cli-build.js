@@ -58,6 +58,20 @@ module.exports = function (defaults) {
 
   let app = new EmberApp(defaults, {
     'ember-cli-babel': { enableTypeScriptTransform: true },
+    /*
+     * Tailwind v4 (Lightning CSS) already minifies in production and rewrites
+     * nested color-mix into sibling rules:
+     *   .foo { border… }
+     *   @supports … { .foo { border: color-mix… } }
+     *   .foo { color: var(--choices-item-color) }
+     * ember-cli-clean-css then “merges” those and drops the later .foo block —
+     * which is where multi-chip text color (and daisy primary-content overrides)
+     * live. Result: GitHub Pages chips keep primary bg but lose readable ink.
+     * Dev server skips clean-css, so the bug only shows on production/Pages.
+     */
+    minifyCSS: {
+      enabled: false,
+    },
     autoImport: {
       watchDependencies: ['choices-ember'],
       webpack: {
